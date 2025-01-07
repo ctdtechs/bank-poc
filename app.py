@@ -75,7 +75,7 @@ def fetch_transactions():
         database="poc_test_db"
     )
     cursor = db_conn.cursor()
-    cursor.execute("SELECT customer_id, first_name, description FROM customer_transactions")
+    cursor.execute("SELECT * FROM BankStatements")
     transactions = cursor.fetchall()
     db_conn.close()
     return transactions
@@ -99,11 +99,11 @@ if user_question:
     st.subheader("Query Result")
     st.write(query_result)
     
-    # Summarize query results
-    if query_result:
-        summary = summarize_results(query_result)
-        st.subheader("Query Result Summary")
-        st.write(summary)
+    # # Summarize query results
+    # if query_result:
+    #     summary = summarize_results(query_result)
+    #     st.subheader("Query Result Summary")
+    #     st.write(summary)
 
 # Section: Transaction Categorization
 st.header("Transaction Categorization")
