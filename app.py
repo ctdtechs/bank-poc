@@ -81,34 +81,26 @@ def fetch_transactions():
     return transactions
 
 # Streamlit UI
-st.title("AI-Powered Bank Transaction Analysis")
+st.title("Bank Transaction Analysis")
 
 # Section: User Question Input
-st.header("Ask a Question About Bank Transactions")
+st.subheader("Ask a Question About Bank Transactions")
 user_question = st.text_input("Enter your question:")
 
 if user_question:
     # Generate and display SQL query
     response = sql_chain.invoke({"question": user_question})
     query = response.split("```sql")[1].strip().split("```")[0] if "```sql" in response else response.strip()
-    st.subheader("Generated SQL Query")
+    st.subheader("Step 1: Generated SQL Query from AI")
     st.code(query, language="sql")
     
     # Execute query and display results
     query_result = execute_query(query)
-    st.subheader("Query Result")
-    st.write(query_result)
+    st.subheader("Step 2: Obtains Query Result from DB")
+    with st.expander("View Query Result"):
+        st.write(query_result)
     
-    # # Summarize query results
-    # if query_result:
-    #     summary = summarize_results(query_result)
-    #     st.subheader("Query Result Summary")
-    #     st.write(summary)
-
-# Section: Transaction Categorization
-st.header("Transaction Categorization")
-if st.button("Generate Categorization"):
-    transactions = fetch_transactions()
-    for customer_id, first_name, description in transactions:
-        category = categorize_transaction(description)
-        st.write(f"**Customer {first_name} (ID: {customer_id})**: {category}")
+    # Summarize query results
+    if query_result:
+        st.subheader("Step 3: Analysis Transaction")
+        summary = summarize_results(query_result)
