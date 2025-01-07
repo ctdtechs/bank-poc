@@ -6,6 +6,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_community.chat_models import ChatOllama
 import mysql.connector
+import json
 
 # AI Model Initialization
 ollama = ChatOllama(model="llama3.1:latest", base_url="http://37.27.125.244:11434")
@@ -47,6 +48,27 @@ def execute_query(query):
     except Exception as e:
         return str(e)
 
+def summarize_results(results):
+    """Use AI to summarize the query results."""
+    summary_prompt = f"Summarize the following database query results: {results}"
+    response = ollama.invoke(summary_prompt)
+     
+    if response:
+        st.write(response.content)
+    else:
+        st.write(f"Error decoding JSON")
+    
+    # If the response is a dictionary, extract the desired field
+    if isinstance(response, dict):
+        if 'text' in response:  # Replace 'text' with the actual key that contains the summary
+            return response['text'].strip()
+        else:
+            return "Error: Response does not contain a 'text' key."
+    elif isinstance(response, str):
+        return response.strip()
+    else:
+        return "Response from AI model."
+
 def categorize_transaction(description):
     """Use AI to categorize the bank transaction based on the description."""
     categories = ["Groceries", "Entertainment", "Bills", "Transportation", "Dining", "Salary", "Others"]
@@ -69,7 +91,7 @@ def fetch_transactions():
     return transactions
 
 # Streamlit UI
-st.title("AI-Powered Bank Transaction Categorization")
+st.title("AI-Powered Bank Transaction Analysis")
 
 # Section: User Question Input
 st.header("Ask a Question About Bank Transactions")
@@ -86,6 +108,12 @@ if user_question:
     query_result = execute_query(query)
     st.subheader("Query Result")
     st.write(query_result)
+    
+    # Summarize query results
+    if query_result:
+        summary = summarize_results(query_result)
+        st.subheader("Query Result Summary")
+        st.write(summary)
 
 # Section: Transaction Categorization
 st.header("Transaction Categorization")
