@@ -52,22 +52,12 @@ def summarize_results(results):
     """Use AI to summarize the query results."""
     summary_prompt = f"Summarize the following database query results: {results}"
     response = ollama.invoke(summary_prompt)
-     
+    
+    # If the response is a dictionary, extract the desired field
     if response:
         st.write(response.content)
     else:
-        st.write(f"Error decoding JSON")
-    
-    # If the response is a dictionary, extract the desired field
-    if isinstance(response, dict):
-        if 'text' in response:  # Replace 'text' with the actual key that contains the summary
-            return response['text'].strip()
-        else:
-            return "Error: Response does not contain a 'text' key."
-    elif isinstance(response, str):
-        return response.strip()
-    else:
-        return "Response from AI model."
+        return "No Response from AI model."
 
 def categorize_transaction(description):
     """Use AI to categorize the bank transaction based on the description."""
